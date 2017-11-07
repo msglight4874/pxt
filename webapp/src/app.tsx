@@ -117,6 +117,10 @@ export class ProjectView
         };
         if (!this.settings.editorFontSize) this.settings.editorFontSize = /mobile/i.test(navigator.userAgent) ? 15 : 20;
         if (!this.settings.fileHistory) this.settings.fileHistory = [];
+
+        (window as any).openJavaScript = (() => this.openJavaScript(false));
+        (window as any).openBlocks = (() => this.openBlocks());
+        (window as any).isBlocksActive = this.isBlocksActive.bind(this);
     }
 
     updateVisibility() {
@@ -1677,7 +1681,7 @@ ${compileService ? `<p>${lf("{0} version:", "C++ runtime")} <a href="${Util.html
             inTutorial ? 'tutorial' : '',
             pxt.options.light ? 'light' : '',
             pxt.BrowserUtils.isTouchEnabled() ? 'has-touch' : '',
-            hideMenuBar ? 'hideMenuBar' : '',
+            (true || hideMenuBar) ? 'hideMenuBar' : '',
             !showEditorToolbar ? 'hideEditorToolbar' : '',
             sandbox && simActive ? 'simView' : '',
             'full-abs',
@@ -1686,7 +1690,7 @@ ${compileService ? `<p>${lf("{0} version:", "C++ runtime")} <a href="${Util.html
 
         return (
             <div id='root' className={rootClasses}>
-                {hideMenuBar ? undefined :
+                {(true || hideMenuBar) ? undefined :
                     <header id="menubar" role="banner" className={"ui menu"}>
                         <div id="accessibleMenu" role="menubar">
                             <sui.Item class={`${targetTheme.invertedMenu ? `inverted` : ''} menu`} role="menuitem" icon="xicon js" text={lf("Skip to JavaScript editor") } onClick={() => this.openJavaScript() }/>
@@ -1732,12 +1736,12 @@ ${compileService ? `<p>${lf("{0} version:", "C++ runtime")} <a href="${Util.html
                                         }
                                         <sui.Item role="menuitem" icon='sign out' text={lf("Reset") } onClick={() => this.reset() } tabIndex={-1}/>
                                         <div className="ui divider"></div>
-                                        {targetTheme.privacyUrl ? <a className="ui item" href={targetTheme.privacyUrl} role="menuitem" title={lf("Privacy & Cookies") } target="_blank" tabIndex={-1}>{lf("Privacy & Cookies") }</a> : undefined}
-                                        {targetTheme.termsOfUseUrl ? <a className="ui item" href={targetTheme.termsOfUseUrl} role="menuitem" title={lf("Terms Of Use") } target="_blank" tabIndex={-1}>{lf("Terms Of Use") }</a> : undefined}
+                                        { (false && targetTheme.privacyUrl) ? <a className="ui item" href={targetTheme.privacyUrl} role="menuitem" title={lf("Privacy & Cookies") } target="_blank" tabIndex={-1}>{lf("Privacy & Cookies") }</a> : undefined}
+                                        { (false && targetTheme.termsOfUseUrl) ? <a className="ui item" href={targetTheme.termsOfUseUrl} role="menuitem" title={lf("Terms Of Use") } target="_blank" tabIndex={-1}>{lf("Terms Of Use") }</a> : undefined}
                                         <sui.Item role="menuitem" text={lf("About...") } onClick={() => this.about() } tabIndex={-1}/>
                                         {electron.isElectron ? <sui.Item role="menuitem" text={lf("Check for updates...") } onClick={() => electron.checkForUpdate() } tabIndex={-1}/> : undefined}
-                                        {targetTheme.feedbackUrl ? <div className="ui divider"></div> : undefined }
-                                        {targetTheme.feedbackUrl ? <a className="ui item" href={targetTheme.feedbackUrl} role="menuitem" title={lf("Give Feedback") } target="_blank" rel="noopener" tabIndex={-1} >{lf("Give Feedback") }</a> : undefined}
+                                        { (false && targetTheme.feedbackUrl) ? <div className="ui divider"></div> : undefined }
+                                        { (false && targetTheme.feedbackUrl) ? <a className="ui item" href={targetTheme.feedbackUrl} role="menuitem" title={lf("Give Feedback") } target="_blank" rel="noopener" tabIndex={-1} >{lf("Give Feedback") }</a> : undefined}
 
                                     </sui.DropdownMenuItem> }
 
@@ -1752,7 +1756,7 @@ ${compileService ? `<p>${lf("{0} version:", "C++ runtime")} <a href="${Util.html
                             </div>
                         </div>
                     </header> }
-                {gettingStarted ?
+                {(false && gettingStarted) ?
                     <div id="getting-started-btn">
                         <sui.Button class="portrait hide bottom attached small getting-started-btn" title={gettingStartedTooltip} text={lf("Getting Started") } onClick={() => this.gettingStarted() } />
                     </div>
@@ -1804,13 +1808,13 @@ ${compileService ? `<p>${lf("{0} version:", "C++ runtime")} <a href="${Util.html
                 {selectLanguage ? <lang.LanguagePicker parent={this} ref={v => this.languagePicker = v} /> : undefined}
                 {inTutorial ? <tutorial.TutorialComplete parent={this} ref={v => this.tutorialComplete = v} /> : undefined }
                 <notification.NotificationDialog parent={this} ref={v => this.notificationDialog = v} />
-                {sandbox ? <div className="ui horizontal small divided link list sandboxfooter">
+                { (false && sandbox) ? <div className="ui horizontal small divided link list sandboxfooter">
                     {targetTheme.organizationUrl && targetTheme.organization ? <a className="item" target="_blank" rel="noopener" href={targetTheme.organizationUrl}>{targetTheme.organization}</a> : undefined}
                     <a target="_blank" className="item" href={targetTheme.termsOfUseUrl} rel="noopener">{lf("Terms of Use") }</a>
                     <a target="_blank" className="item" href={targetTheme.privacyUrl} rel="noopener">{lf("Privacy") }</a>
                     <span className="item"><a className="ui thin portrait only" title={compileTooltip} onClick={() => this.compile() }><i className="icon download"/>{lf("Download") }</a></span>
                 </div> : undefined}
-                {cookieConsented ? undefined : <div id='cookiemsg' className="ui teal inverted black segment" role="alert">
+                { (true ||cookieConsented) ? undefined : <div id='cookiemsg' className="ui teal inverted black segment" role="alert">
                     <button aria-label={lf("Close") } tabIndex={0} className="ui right floated icon button clear inverted" onClick={consentCookie}>
                         <i className="remove icon"></i>
                     </button>

@@ -32,6 +32,12 @@ export class Editor extends srceditor.Editor {
     showToolboxCategories: CategoryMode = CategoryMode.Basic;
     cachedToolbox: string;
     filters: pxt.editor.ProjectFilters;
+    
+    constructor(public parent: pxt.editor.IProjectView) {
+        super(parent);
+        (window as any).loadXml = this.loadXml.bind(this);
+        (window as any).getXml = this.getXml.bind(this);
+    }
 
     setVisible(v: boolean) {
         super.setVisible(v);
@@ -529,6 +535,46 @@ export class Editor extends srceditor.Editor {
         return file.getExtension() == "blocks"
     }
 
+    getXml(cb: Function) {
+        (window as any).openBlocks();
+        let self = this;
+        let isLoaded = false;        
+        let backToJS = !(window as any).isBlocksActive();
+        
+        (window as any).openBlocks();
+        let id = setInterval(function() {
+            if ((window as any).isBlocksActive()) {
+                cb(self.getCurrentSource());
+
+                if (backToJS) {
+                    (window as any).openJavaScript();
+                }
+                clearInterval(id);
+            }
+        }, 200);
+    }
+
+    loadXml(xml: string) {
+        // 先切換至 block 編輯器並載入 xml
+        let epkg: any = { files: { 'main.blocks': null as any } };
+        let file = new pkg.File(epkg, 'main.blocks', xml);
+        let self = this;
+        let backToJS = !(window as any).isBlocksActive();
+
+        (window as any).openBlocks();
+        let id = setInterval(function() {
+            if ((window as any).isBlocksActive()) {
+                self.loadFileAsync(file);
+                self.domUpdate();
+
+                if (backToJS) {
+                    (window as any).openJavaScript();
+                }
+                clearInterval(id);
+            }
+        }, 200);
+    }
+
     loadFileAsync(file: pkg.File): Promise<void> {
         this.currSource = file.content;
         this.typeScriptSaveable = false;
@@ -552,7 +598,7 @@ export class Editor extends srceditor.Editor {
         }
         return Promise.resolve();
     }
-
+    
     public switchToTypeScript() {
         pxt.tickEvent("blocks.switchjavascript");
         this.parent.switchTypeScript();

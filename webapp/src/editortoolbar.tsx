@@ -14,6 +14,8 @@ type ISettingsProps = pxt.editor.ISettingsProps;
 export class EditorToolbar extends data.Component<ISettingsProps, {}> {
     constructor(props: ISettingsProps) {
         super(props);
+        // Export setProjectName
+        (window as any).setProjectName = this.saveProjectName.bind(this);
     }
 
     saveProjectName(name: string, view?: string) {
@@ -246,7 +248,7 @@ export class EditorToolbar extends data.Component<ISettingsProps, {}> {
                                        <sui.Button role="menuitem" class={`primary large fluid download-button download-button-full ${downloadButtonClasses}`} icon="download" text={lf("Download") } title={compileTooltip} onClick={() => this.compile('tablet') } />
                                     </div>
                                 </div> : undefined }
-                                {showProjectRename ?
+                                {(false && showProjectRename) ?
                                     <div className="row" style={compileBtn ? { paddingTop: 0 } : {}}>
                                         <div className="column">
                                             <div className="ui item large right labeled fluid input projectname-input projectname-tablet" title={lf("Pick a name for your project") }>
@@ -309,7 +311,7 @@ export class EditorToolbar extends data.Component<ISettingsProps, {}> {
                             </div>
                         }
                     </div>
-                    {showProjectRename ?
+                    {(false && showProjectRename) ?
                         <div className="column left aligned">
                             <div className={`ui right labeled input projectname-input projectname-computer`} title={lf("Pick a name for your project") }>
                                 <label htmlFor="fileNameInput2" id="fileNameInputLabel2" className="accessible-hidden">{lf("Type a name for your project")}</label>
