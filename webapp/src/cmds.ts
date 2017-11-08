@@ -85,7 +85,7 @@ function showUploadInstructionsAsync(fn: string, url: string): Promise<void> {
             class: "lightgrey focused",
             url,
             fileName: fn
-        } : undefined, docUrl ? {
+        } : undefined, (docUrl && false) ? {
             label: lf("Help"),
             icon: "help",
             class: "lightgrey focused",
